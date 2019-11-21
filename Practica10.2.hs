@@ -132,8 +132,15 @@ pertenecePila y pila
 --    contenidaPila ejP1 ejP2 == False
 -- ---------------------------------------------------------------------
 
+
 contenidaPila :: (Eq a) => Pila a -> Pila a -> Bool
-contenidaPila = undefined
+
+contenidaPila p1 p2
+    | esVacia p1 = True
+    | otherwise = pertenecePila x p2 && contenidaPila resto p2
+    where x = cima p1
+          resto = desapila p1
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 4: Defiir la función
@@ -144,8 +151,18 @@ contenidaPila = undefined
 --    prefijoPila ejP5 ejP1 == True
 -- ---------------------------------------------------------------------
 
+
 prefijoPila :: (Eq a) => Pila a -> Pila a -> Bool
-prefijoPila = undefined 
+
+prefijoPila p1 p2
+    | esVacia p1 = True
+    | esVacia p2 = False
+    | otherwise = (x == y) && (prefijoPila resto1 resto2)
+    where x = cima p1
+          y = cima p2
+          resto1 = desapila p1
+          resto2 = desapila p2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 5: Definir la función
@@ -156,8 +173,15 @@ prefijoPila = undefined
 --    subPila ejP3 ejP1 == True
 -- ---------------------------------------------------------------------
 
+
 subPila :: (Eq a) => Pila a -> Pila a -> Bool
-subPila = undefined 
+
+subPila p1 p2
+    | esVacia p1 = True
+    | esVacia p2 = False
+    | otherwise = (prefijoPila p1 p2) || (subPila p1 resto2)
+    where resto2 = desapila p2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 6: Definir la función
@@ -168,8 +192,30 @@ subPila = undefined
 --    ordenadaPila ejP4 == False
 -- ---------------------------------------------------------------------
 
+
 ordenadaPila :: (Ord a) => Pila a -> Bool
-ordenadaPila = undefined 
+
+ordenadaPila pila = ordenadaPilaAux x resto
+    where x = cima pila
+          resto = desapila pila
+
+ordenadaPilaAux x pila
+    | esVacia pila = True
+    | otherwise = (x < y) && (ordenadaPilaAux y resto)
+    where y = cima pila
+          resto = desapila pila
+
+
+ordenadaPilaProf :: (Ord a) => Pila a -> Bool
+
+ordenadaPilaProf pila
+    | esVacia pila = True
+    | esVacia resto = True
+    | otherwise = (x < y) && (ordenadaPilaProf resto)
+    where x = cima pila
+          resto = desapila pila
+          y = cima resto
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 7.1: Definir una función
@@ -179,8 +225,21 @@ ordenadaPila = undefined
 --    lista2Pila [1..6] == 1|2|3|4|5|6|-
 -- ---------------------------------------------------------------------
 
+
 lista2Pila :: [a] -> Pila a
-lista2Pila xs = undefined
+
+lista2Pila xs = lista2PilaAux xs (length xs - 1) vacia
+
+lista2PilaAux xs cont pila
+    | cont == 0 = res
+    | otherwise = lista2PilaAux xs (cont-1) nuevaPila
+    where res = apila (xs!!cont) pila
+          nuevaPila = apila (xs!!cont) pila
+
+
+--lista2PilaProf :: [a] -> Pila a
+
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 7.2: Definir una función
@@ -190,22 +249,37 @@ lista2Pila xs = undefined
 --    pila2Lista ejP2 == [2,5,8,11,14,17]
 -- ---------------------------------------------------------------------
 
+
 pila2Lista :: Pila a -> [a]
-pila2Lista = undefined
+
+pila2Lista pila = pila2ListaAux pila []
+
+pila2ListaAux pila res
+    | esVacia pila = res
+    | otherwise = pila2ListaAux resto (res++[x])
+    where x = cima pila
+          resto = desapila pila
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 7.3: Comprobar con QuickCheck que la función pila2Lista es
 -- la inversa de  lista2Pila, y recíprocamente.
 -- ---------------------------------------------------------------------
 
+
 prop_pila2Lista :: Pila Int -> Bool
-prop_pila2Lista p = undefined
+
+prop_pila2Lista pila = (lista2Pila (pila2Lista pila)) == pila
+
 
 -- ghci> quickCheck prop_pila2Lista
 -- +++ OK, passed 100 tests.
 
+
 prop_lista2Pila :: [Int] -> Bool
-prop_lista2Pila xs = undefined
+
+prop_lista2Pila xs = (pila2Lista (lista2Pila xs)) == xs
+
 
 -- ghci> quickCheck prop_lista2Pila
 -- +++ OK, passed 100 tests.
@@ -244,8 +318,27 @@ prop_ordenaInserPila p = undefined
 --    -1|7|8|10|0|3|4|-
 -- ---------------------------------------------------------------------
 
+
 nubPila :: (Eq a) => Pila a -> Pila a
-nubPila = undefined
+
+nubPila pila = nubPilaAux pila [] []
+
+nubPilaAux pila ls res
+    | esVacia pila = lista2Pila res
+    | elem x ls = nubPilaAux resto ls res
+    | otherwise = nubPilaAux resto (ls++[x]) (res++[x])
+    where x = cima pila
+          resto = desapila pila
+
+
+nubPila2 :: (Eq a) => Pila a -> Pila a
+
+nubPila2 pila
+    | esVacia resto = apila x vacia
+    | pertenecePila x resto = nubPila2 resto
+    | otherwise = apila x (nubPila2 resto)
+    where x = cima pila
+          resto = desapila pila
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 10.2: Definir la propiedad siguiente: "las composición de
@@ -255,11 +348,25 @@ nubPila = undefined
 -- verifique la propiedad.
 -- ---------------------------------------------------------------------
 
+
 -- La propiedad es
+
 prop_nubPila :: Pila Int -> Bool
-prop_nubPila p = undefined
+
+prop_nubPila p = pila2Lista (nubPilaProf p) == nub (pila2Lista p)
+
 
 -- La comprobación es
+
+nubPilaProf :: (Eq a) => Pila a -> Pila a
+
+nubPilaProf pila
+    | esVacia resto = vacia
+    | otherwise = apila x (nubPilaProf restoF)
+    where x = cima pila
+          resto = desapila pila
+          restoF = filtraPila (/=x) resto
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 11: Definir la función 
