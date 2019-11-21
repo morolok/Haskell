@@ -31,24 +31,40 @@
 -- Importación de librerías                                           --
 -- ---------------------------------------------------------------------
 
+
 import Data.List
+
 import Test.QuickCheck
 
 -- Hay que elegir una implementación del TAD colas:
+
 import ColaConListas
+
 -- import ColaConDosListas
+
 -- import I1M.Cola
+
     
 -- ---------------------------------------------------------------------
 -- Nota. A lo largo de la relación de ejercicios usaremos los siguientes
 -- ejemplos de colas:
+
+
 c1, c2, c3, c4, c5, c6 :: Cola Int
+
 c1 = foldr inserta vacia [1..20]
+
 c2 = foldr inserta vacia [2,5..18]
+
 c3 = foldr inserta vacia [3..10]
+
 c4 = foldr inserta vacia [4,-1,7,3,8,10,0,3,3,4]
+
 c5 = foldr inserta vacia [15..20]
+
 c6 = foldr inserta vacia (reverse [1..20])
+
+
 -- ---------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------
@@ -60,8 +76,18 @@ c6 = foldr inserta vacia (reverse [1..20])
 --    ultimoCola c5 == 15
 -- ---------------------------------------------------------------------
 
+
 ultimoCola :: Cola a -> a
-ultimoCola c = undefined
+
+ultimoCola c = ultimoColaAux c x
+    where x = primero c
+
+ultimoColaAux c prim
+    | esVacia c = prim
+    | otherwise = ultimoColaAux r x
+    where r = resto c
+          x = primero c
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2: Definir la función
@@ -106,8 +132,16 @@ algunoVerifica p c = undefined
 --    ponAlaCola c2 c3 == C [17,14,11,8,5,2,10,9,8,7,6,5,4,3]
 -- ---------------------------------------------------------------------
 
+
 ponAlaCola :: Cola a -> Cola a -> Cola a
-ponAlaCola c1 c2 = undefined
+
+ponAlaCola col1 col2
+    | esVacia col2 = col1
+    | otherwise = ponAlaCola nuevaC1 r
+    where nuevaC1 = inserta x col1
+          x = primero col2
+          r = resto col2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 6: Definir la función
