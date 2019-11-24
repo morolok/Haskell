@@ -145,8 +145,13 @@ inorden (N x ai ad) = (inorden ai) ++ [x] ++ (inorden ad)
 --    postorden (N 9 (N 3 (H 2) (H 4)) (H 7))  ==  [2,4,3,7,9]
 -- ---------------------------------------------------------------------
 
+
 postorden :: Arbol a -> [a]
-postorden = undefined
+
+postorden (H x) = [x]
+
+postorden (N x ai ad) = (postorden ai) ++ (postorden ad) ++ [x]
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 4.1. Definir la función
@@ -155,8 +160,12 @@ postorden = undefined
 --    espejo (N 9 (N 3 (H 2) (H 4)) (H 7)) == N 9 (H 7) (N 3 (H 4) (H 2))
 -- ---------------------------------------------------------------------
 
+
 espejo :: Arbol a -> Arbol a
-espejo = undefined
+
+espejo (H x) = (H x)
+
+espejo (N x ai ad) = (N x ad ai)
 
 
 -- ---------------------------------------------------------------------
