@@ -146,7 +146,6 @@ evaluaG (P3 e1 e2) vs = (evaluaG e1 vs) * (evaluaG e2 vs)
 evaluaG (S3 e1 e2) vs = (evaluaG e1 vs) + (evaluaG e2 vs)
 
 
-
 -- ---------------------------------------------------------------------
 -- Ejercicio 6. Definir la función sumas, tal que (sumas e) es el 
 -- número de sumas en la expresión e. Por ejemplo, 
