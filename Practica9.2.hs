@@ -237,8 +237,13 @@ repeatArbol x = (N x (repeatArbol x) (repeatArbol x))
 --    replicateArbol 2 5  ==  N 5 (N 5 (H 5) (H 5)) (N 5 (H 5) (H 5))
 -- ---------------------------------------------------------------------
 
+
 replicateArbol :: Int -> a -> Arbol a
-replicateArbol n = undefined
+
+replicateArbol 0 x = (H x)
+
+replicateArbol n x = (N x (replicateArbol (n-1) x) (replicateArbol (n-1) x))
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 7.1. Definir la función
