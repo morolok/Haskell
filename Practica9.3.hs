@@ -98,6 +98,16 @@ evaluaE (P2 e1 e2) n = (evaluaE e1 n) * (evaluaE e2 n)
 --    numVars (P2 X (S2 (C2 13) X))  ==  2
 -- ---------------------------------------------------------------------
 
+
+numVars (X) = 1
+
+numVars (C2 x) = 0
+
+numVars (S2 e1 e2) = (numVars e1) + (numVars e2)
+
+numVars (P2 e1 e2) = (numVars e1) + (numVars e2)
+
+
 -- ---------------------------------------------------------------------
 -- Ejercicio 5. Las expresiones aritméticas con variables genéricas 
 -- pueden representarse usando el siguiente tipo de datos  
@@ -144,7 +154,17 @@ evaluaG (S3 e1 e2) vs = (evaluaG e1 vs) + (evaluaG e2 vs)
 --    sumas (S3 (V3 'z') (S3 (C3 3) (V3 'x')))  ==  2
 --    sumas (P3 (V3 'z') (P3 (C3 3) (V3 'x')))  ==  0
 -- ---------------------------------------------------------------------
-                   
+
+
+sumas (C3 _) = 0
+
+sumas (V3 _) = 0
+
+sumas (S3 e1 e2) = 1 + (sumas e1) + (sumas e2)
+
+sumas (P3 e1 e2) = (sumas e1) + (sumas e2)
+
+
 -- ---------------------------------------------------------------------
 -- Ejercicio 7. Definir la función sustitucion, tal que 
 -- (sustitucion e s) es la expresión obtenida sustituyendo las variables 
@@ -154,6 +174,18 @@ evaluaG (S3 e1 e2) vs = (evaluaG e1 vs) + (evaluaG e2 vs)
 --    ghci> sustitucion (P3 (V3 'z') (S3 (C3 3) (V3 'y'))) [('x',7),('z',9)]
 --    P3 (C3 9) (S3 (C3 3) (V3 'y'))
 -- ---------------------------------------------------------------------
+
+
+sustitucion (C3 x) s = (C3 x)
+
+sustitucion (V3 x) s
+    | ls == [] = (V3 x)
+    | otherwise = (C3 (head ls))
+    where ls = [snd p | p <- s, fst p == x]
+
+sustitucion (S3 e1 e2) s = (S3 (sustitucion e1 s) (sustitucion e2 s))
+
+sustitucion (P3 e1 e2) s = (P3 (sustitucion e1 s) (sustitucion e2 s))
 
 
 -- ---------------------------------------------------------------------
@@ -168,3 +200,13 @@ evaluaG (S3 e1 e2) vs = (evaluaG e1 vs) + (evaluaG e2 vs)
 --    reducible (C3 3)                           == False
 --    reducible (V3 'x')                         == False
 -- ---------------------------------------------------------------------
+
+
+reducible (C3 x) = True
+
+reducible (V3 x) = False
+
+reducible (S3 e1 e2) = (reducible e1) && (reducible e2)
+
+reducible (P3 e1 e2) = (reducible e1) && (reducible e2)
+
