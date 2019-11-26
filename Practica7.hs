@@ -242,14 +242,17 @@ agrupaR = undefined
 -- tener menos de n elementos). Por ejemplo, 
 --    ghci> agrupa 2 [3,1,5,8,2,7]
 --    [[3,1],[5,8],[2,7]]
---    ghci> agrupa 2 [3,1,5,8,2,7,9] 
+--    ghci> agrupa 2 [3,1,5,8,2,7,9]
 --    [[3,1],[5,8],[2,7],[9]]
 --    ghci> agrupa 5 "todo necio confunde valor y precio"
 --    ["todo ","necio"," conf","unde ","valor"," y pr","ecio"]
 -- ---------------------------------------------------------------------------- 
 
+
 agrupa :: Int -> [a] -> [[a]]
-agrupa n = undefined
+
+agrupa n xs = map (take n) $ takeWhile (not.null) $ iterate (drop n) xs
+
 
 -- ----------------------------------------------------------------------------
 -- Ejercicio 5.3. Comprobar con QuickCheck que todos los grupos de
@@ -631,8 +634,19 @@ fib = undefined
 --    take 10 fibs1  ==  [0,1,1,2,3,5,8,13,21,34]
 -- ---------------------------------------------------------------------
 
+
 fibs1 :: [Integer]
-fibs1 = undefined
+
+fibs1 = [x | (x,y) <- iterate (\(x,y) -> (y,x+y)) (0,1)]
+
+
+fibs12 = [fib i | i <- [1..]]
+    where fib 0 = 0
+          fib 1 = 1
+          fib n = fib (n-1) + fib (n-2)
+
+
+fibs13 = 0:1:1:[(fibs13!!(i-1)) + (fibs13!!(i-2)) | i <- [3..]]
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 12.3. Definir, por recursión, la función
@@ -651,8 +665,11 @@ fibs2 = undefined
 --    take 10 fibs3  ==  [0,1,1,2,3,5,8,13,21,34]
 -- ---------------------------------------------------------------------
 
+
 fibs3 :: [Integer]
-fibs3 = undefined
+
+fibs3 = 0:1:(zipWith (+) fibs3 (tail fibs3))
+
 
 -- ---------------------------------------------------------------------
 -- § El triángulo de Pascal                                           --
