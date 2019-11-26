@@ -201,8 +201,18 @@ contenidaCola c1 c2 = undefined
 --    prefijoCola c5 c1 == True
 -- ---------------------------------------------------------------------
 
+
 prefijoCola :: Eq a => Cola a -> Cola a -> Bool
-prefijoCola c1 c2 = undefined
+
+prefijoCola c1 c2
+    | esVacia c1 = True
+    | esVacia c2 = False
+    | otherwise = (x == y) && (prefijoCola r1 r2)
+    where x = primero c1
+          y = primero c2
+          r1 = resto c1
+          r2 = resto c2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 11: Definir la función
@@ -213,8 +223,11 @@ prefijoCola c1 c2 = undefined
 --    subCola c3 c1 == True
 -- ---------------------------------------------------------------------
 
+
 subCola :: Eq a => Cola a -> Cola a -> Bool
+
 subCola c1 c2 = undefined
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 12: Definir la función
@@ -236,8 +249,21 @@ ordenadaCola c = undefined
 --    lista2Cola [1..6] == C [1,2,3,4,5,6]
 -- ---------------------------------------------------------------------
 
+
 lista2Cola :: [a] -> Cola a
-lista2Cola xs = undefined
+
+lista2Cola xs = lista2ColaAux xs vacia
+
+lista2ColaAux [] res = res
+
+lista2ColaAux (x:xs) res = lista2ColaAux xs (inserta x res)
+
+
+lista2ColaP :: [a] -> Cola a
+
+lista2ColaP xs = foldl (\c x -> inserta x c) vacia xs
+                    -- flip inserta
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 13.2: Definir una función
@@ -247,8 +273,15 @@ lista2Cola xs = undefined
 --    cola2Lista c2 == [17,14,11,8,5,2]
 -- ---------------------------------------------------------------------
 
+
 cola2Lista :: Cola a -> [a]
-cola2Lista c = undefined
+
+cola2Lista cola
+    | esVacia cola = []
+    | otherwise = [x]++(cola2Lista r)
+    where x = primero cola
+          r = resto cola
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 13.3. Comprobar con QuickCheck que la función cola2Lista es
