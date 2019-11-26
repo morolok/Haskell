@@ -21,10 +21,15 @@
 -- Importación de librerías                                           --
 -- ---------------------------------------------------------------------
 
-import qualified Data.Vector as V 
-import Data.Matrix 
+
+import qualified Data.Vector as V
+
+import Data.Matrix
+
 import Data.Ratio
+
 import Data.Maybe
+
 
 -- ---------------------------------------------------------------------
 -- Tipos de los vectores y de las matrices                            --
@@ -46,8 +51,11 @@ import Data.Maybe
 --    fromList [3,2,5]
 -- ---------------------------------------------------------------------
 
+
 listaVector :: Num a => [a] -> V.Vector a
-listaVector = undefined
+
+listaVector xs = V.fromList xs
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2. Definir la función
@@ -59,8 +67,11 @@ listaVector = undefined
 --    ( 2 4 7 )
 -- ---------------------------------------------------------------------
 
+
 listaMatriz :: Num a => [[a]] -> Matrix a
-listaMatriz = undefined
+
+listaMatriz xss = fromLists xss
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 3. Definir la función
