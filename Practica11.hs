@@ -568,8 +568,11 @@ anulaColumnaDesde p j i
 --    [5]
 -- ---------------------------------------------------------------------
 
+
 elementosNoNulosColDesde :: (Num a, Eq a) => Matrix a -> Int -> Int -> [a]
-elementosNoNulosColDesde p j i = undefined
+
+elementosNoNulosColDesde p j i = [y | k <- [i .. nrows p], let y = p!(k,j), y /= 0]
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 31. Definir la función
