@@ -81,8 +81,11 @@ listaMatriz xss = fromLists xss
 --    numFilas (listaMatriz [[1,3,5],[2,4,7]])  ==  2
 -- ---------------------------------------------------------------------
 
+
 numFilas :: Num a => Matrix a -> Int
-numFilas = undefined
+
+numFilas m = nrows m
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 4. Definir la función
@@ -92,8 +95,11 @@ numFilas = undefined
 --    numColumnas (listaMatriz [[1,3,5],[2,4,7]])  ==  3
 -- ---------------------------------------------------------------------
 
+
 numColumnas :: Num a => Matrix a -> Int
-numColumnas = undefined
+
+numColumnas m = ncols m
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 5. Definir la función
@@ -118,8 +124,11 @@ dimension p = undefined
 --    [[5,1,0],[3,2,6]]
 -- ---------------------------------------------------------------------
 
+
 matrizLista :: Num a => Matrix a -> [[a]]
-matrizLista p = undefined
+
+matrizLista p = toLists p
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 8. Definir la función
@@ -133,8 +142,11 @@ matrizLista p = undefined
 --    [3,2,5]
 -- ---------------------------------------------------------------------
 
+
 vectorLista :: Num a => V.Vector a -> [a]
-vectorLista = undefined
+
+vectorLista x = V.toList x
+
 
 -- ---------------------------------------------------------------------
 -- Suma de matrices                                                   --
@@ -199,8 +211,11 @@ columnaMat = undefined
 --    110
 -- ---------------------------------------------------------------------
 
+
 prodEscalar :: Num a => V.Vector a -> V.Vector a -> a
-prodEscalar v1 v2 = undefined
+
+prodEscalar v1 v2 = sum [x*y | (x,y) <- zip (vectorLista v1) (vectorLista v2)]
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 13. Definir la función
@@ -339,8 +354,11 @@ submatriz = undefined
 --    ( 5 1 0 )
 -- ---------------------------------------------------------------------
 
+
 intercambiaFilas :: Num a => Int -> Int -> Matrix a -> Matrix a
-intercambiaFilas = undefined
+
+intercambiaFilas k l p = switchRows k l p
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 21. Definir la función
@@ -354,8 +372,11 @@ intercambiaFilas = undefined
 --    ( 9 6 4 )
 -- ---------------------------------------------------------------------
 
+
 intercambiaColumnas :: Num a => Int -> Int -> Matrix a -> Matrix a
-intercambiaColumnas = undefined
+
+intercambiaColumnas k l p = switchCols k l p
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 22. Definir la función
@@ -369,14 +390,22 @@ intercambiaColumnas = undefined
 --    (  4  6  9 )
 -- ---------------------------------------------------------------------
 
+
 multFilaPor :: Num a => Int -> a -> Matrix a -> Matrix a
-multFilaPor k x p = undefined
+
+multFilaPor k x p = matrix (nrows p) (ncols p) f
+    where f (i,j) | i == k = x * (p!(i,j))
+                  | otherwise = p!(i,j)
+
+
+multFilaPor2 k x p = scaleRow x k p
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 23. Definir la función
 --    sumaFilaFila :: Num a => Int -> Int -> Matrix a -> Matrix a
 -- tal que (sumaFilaFila k l p) es la matriz obtenida sumando la fila l
--- a la fila k d la matriz p. Por ejemplo,
+-- a la fila k de la matriz p. Por ejemplo,
 --    ghci> let p = listaMatriz [[5,1,0],[3,2,6],[4,6,9]]
 --    ghci> sumaFilaFila 2 3 p
 --    (  5  1  0 )
@@ -384,8 +413,11 @@ multFilaPor k x p = undefined
 --    (  4  6  9 )
 -- ---------------------------------------------------------------------
 
+
 sumaFilaFila :: Num a => Int -> Int -> Matrix a -> Matrix a
-sumaFilaFila k l p = undefined
+
+sumaFilaFila k l p = combineRows k (1) l p
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 24. Definir la función
@@ -421,8 +453,14 @@ sumaFilaPor k l x p = undefined
 --    Nothing
 -- ---------------------------------------------------------------------
 
+
 buscaIndiceDesde :: (Num a, Eq a) => Matrix a -> Int -> Int -> Maybe Int
-buscaIndiceDesde p j i = undefined
+
+buscaIndiceDesde p j i
+    | i > nrows p = Nothing
+    | p!(i,j) /= 0 = Just i
+    | otherwise = buscaIndiceDesde p j (i+1)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 26. Definir la función
@@ -438,8 +476,15 @@ buscaIndiceDesde p j i = undefined
 --    Nothing
 -- ---------------------------------------------------------------------
 
+
 buscaPivoteDesde :: (Num a, Eq a) => Matrix a -> Int -> Int -> Maybe a
-buscaPivoteDesde p j i = undefined
+
+buscaPivoteDesde p j i
+    | isNothing k2 = Nothing
+    | otherwise = Just (p!(k,j))
+    where k2 = buscaIndiceDesde p j i
+          k = fromJust k2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 27. Definir la función
@@ -456,8 +501,11 @@ buscaPivoteDesde p j i = undefined
 --    False
 -- ---------------------------------------------------------------------
 
+
 anuladaColumnaDesde :: (Num a, Eq a) => Matrix a -> Int -> Int -> Bool
-anuladaColumnaDesde p j i = undefined
+
+anuladaColumnaDesde p j i = isNothing $ buscaIndiceDesde p j (i+1)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 28. Definir la función
@@ -471,9 +519,15 @@ anuladaColumnaDesde p j i = undefined
 --    [[2.0,3.0,1.0],[5.0,0.0,5.0],[4.0,0.0,7.0]]
 -- ---------------------------------------------------------------------
 
-anulaEltoColumnaDesde :: (Fractional a, Eq a) => 
-                         Matrix a -> Int -> Int -> Matrix a
-anulaEltoColumnaDesde p j i = undefined
+
+anulaEltoColumnaDesde :: (Fractional a, Eq a) => Matrix a -> Int -> Int -> Matrix a
+
+anulaEltoColumnaDesde p j i
+    | isNothing k2 = p
+    | otherwise = sumaFilaPor k i (-p!(k,j)/p!(i,j)) p
+    where k2 = buscaIndiceDesde p j (i+1)
+          k = fromJust k2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 29. Definir la función
@@ -491,9 +545,13 @@ anulaEltoColumnaDesde p j i = undefined
 --    [[4 % 1,5 % 1],[0 % 1,1 % 1],[0 % 1,5 % 2]]
 -- ---------------------------------------------------------------------
 
-anulaColumnaDesde :: (Fractional a, Eq a) => 
-                     Matrix a -> Int -> Int -> Matrix a
-anulaColumnaDesde p j i = undefined
+
+anulaColumnaDesde :: (Fractional a, Eq a) => Matrix a -> Int -> Int -> Matrix a
+
+anulaColumnaDesde p j i
+    | anuladaColumnaDesde p j i = p
+    | otherwise = anulaColumnaDesde (anulaEltoColumnaDesde p j i) j i
+
 
 -- ---------------------------------------------------------------------
 -- Algoritmo de Gauss para triangularizar matrices                    --
