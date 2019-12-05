@@ -8,7 +8,9 @@
 -- § Librerías auxiliares                                             --
 -- ---------------------------------------------------------------------
 
+
 import Data.List (genericLength)
+
 import Data.Matrix
 
 
@@ -47,8 +49,16 @@ import Data.Matrix
 --    [(1,1),(2,1),(3,1),(3,2),(3,3),(3,4)]
 -- ---------------------------------------------------------------------
 
+
 caminosR :: (Int,Int) -> [[(Int,Int)]]
-caminosR p = undefined
+
+caminosR (1,y) = [[(1,z) | z <- [y,y-1..1]]]
+
+caminosR (x,1) = [[(1,z) | z <- [x,x-1..1]]]
+
+caminosR (x,y) = [(x,y):cs | cs <- (caminosR (x-1,y) ++ caminosR (x,y-1))]
+
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1.2. Definir, por recursión, la función
@@ -57,8 +67,15 @@ caminosR p = undefined
 -- dimensión mxn desde (1,1) hasta (m,n).
 -- ---------------------------------------------------------------------
 
+
 caminosPD :: (Int,Int) -> [[(Int,Int)]]
-caminosPD p = undefined
+
+caminosPD (m,n) = q!(m,n)
+    where q = matrix m n f
+          f (x,1) = [[(z,1) | z <- [1..x]]]
+          f (1,y) = [[(1,z) | z <- [1..y]]]
+          f (x,y) = [cs ++ [(x,y)] | cs <- (q!(x-1,y) ++ q!(x,y-1))]
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1.3. Comparar la eficiencia calculando el tiempo necesario
