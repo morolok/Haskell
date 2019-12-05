@@ -314,11 +314,15 @@ diagonalPral = undefined
 --    ghci> matrizLista q
 --    [[5,3],[1,2],[0,6]]
 --    ghci> diagonalSec q
---    fromList [1,2]
+--    fromList [1,3]
 -- ---------------------------------------------------------------------
 
+
 diagonalSec :: Num a => Matrix a -> V.Vector a
-diagonalSec p = undefined
+
+diagonalSec p = V.fromList [p!(i,n-i+1) | i <- [1..n]]
+    where n = min (nrows p) (ncols p)
+
 
 -- ---------------------------------------------------------------------
 -- Submatrices                                                        --
@@ -589,9 +593,13 @@ elementosNoNulosColDesde p j i = [y | k <- [i .. nrows p], let y = p!(k,j), y /=
 --    ghci> let q = listaMatriz [[3,2,5],[5,7,0],[6,0,0]]
 --    ghci> existeColNoNulaDesde q 2 2
 -- ---------------------------------------------------------------------
-  
+
+
 existeColNoNulaDesde :: (Num a, Eq a) => Matrix a -> Int -> Int -> Bool
-existeColNoNulaDesde p j i = undefined
+
+existeColNoNulaDesde p j i = or [(not.null) (elementosNoNulosColDesde p l i) | l <- [j..m]]
+    where m = ncols p
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 32. Definir la función
@@ -611,9 +619,15 @@ existeColNoNulaDesde p j i = undefined
 --    Nothing
 -- ---------------------------------------------------------------------
 
-menorIndiceColNoNulaDesde :: (Num a, Eq a) => 
-                             Matrix a -> Int -> Int -> Maybe Int
-menorIndiceColNoNulaDesde p j i = undefined
+
+menorIndiceColNoNulaDesde :: (Num a, Eq a) => Matrix a -> Int -> Int -> Maybe Int
+
+menorIndiceColNoNulaDesde p j i
+    | null ls = Nothing
+    | otherwise = Just (head ls)
+    where m = ncols p
+          ls = [l | l <- [j..m], not (null (elementosNoNulosColDesde p l i))]
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 33. Definir la función
@@ -644,8 +658,19 @@ menorIndiceColNoNulaDesde p j i = undefined
 --    ( 2.0 0.0 1.0 )
 -- ---------------------------------------------------------------------
 
+
 gaussAux :: (Fractional a, Eq a) => Matrix a -> Int -> Int -> Matrix a
-gaussAux p i j = undefined
+
+gaussAux p i j
+    | nrows p == i && ncols p == j = p
+    | not (existeColNoNulaDesde p j i) = p
+    | otherwise = gaussAux p' (i+1) (j+1)
+    where j' = fromJust (menorIndiceColNoNulaDesde p j i)
+          p1 = intercambiaColumnas i j' p
+          i' = fromJust (buscaIndiceDesde p1 j i)
+          p2 = intercambiaFilas i i' p1
+          p' = anulaColumnaDesde p2 j i
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 34. Definir la función
