@@ -26,7 +26,9 @@
 -- § Librerías auxiliares                                             --
 -- ---------------------------------------------------------------------
 
+
 import Data.Char
+
 
 -- ---------------------------------------------------------------------
 -- § Representación                                                   --
@@ -37,11 +39,18 @@ import Data.Char
 -- inicial es [5,4,3,2,1]. 
 
 -- Representación del tablero.
+
+
 type Tablero = [Int]
 
+
 -- inicial es el tablero al principio del juego.
+
+
 inicial ::  Tablero
+
 inicial =  [5,4,3,2,1]
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1. Definir la función
@@ -52,8 +61,11 @@ inicial =  [5,4,3,2,1]
 --    finalizado [1,3,0,0,1]  ==  False
 -- ---------------------------------------------------------------------
 
+
 finalizado :: Tablero -> Bool
-finalizado t = undefined
+
+finalizado t = sum t == 0
+
 
 -- ---------------------------------------------------------------------
 -- Ejecicio 2.2. Definir la función
@@ -66,8 +78,11 @@ finalizado t = undefined
 --    valida [4,3,2,1,0] 2 0  ==  False
 -- ---------------------------------------------------------------------
 
+
 valida :: Tablero -> Int -> Int -> Bool
-valida t f n = undefined
+
+valida t f n = (n >= 1) && (t!!(f-1) >= n)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 3. Definir la función
@@ -77,8 +92,18 @@ valida t f n = undefined
 --    jugada [4,3,2,1,0] 2 1  ==  [4,2,2,1,0]
 -- ---------------------------------------------------------------------
 
+
 jugada :: Tablero -> Int -> Int -> Tablero
-jugada t f n = undefined
+
+jugada t f n = jugadaAux t (f-1) n [] 0
+
+jugadaAux t f n res cont
+    | cont == length t = res
+    | f == cont = jugadaAux t f n (res++[x]) (cont+1)
+    | otherwise = jugadaAux t f n (res++[y]) (cont+1)
+    where x = (t!!cont) - n
+          y = (t!!cont)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 4. Definir la acción
@@ -89,8 +114,12 @@ jugada t f n = undefined
 --    ghci> 
 -- ---------------------------------------------------------------------
 
+
 nuevaLinea :: IO ()
-nuevaLinea = undefined
+
+nuevaLinea = do
+    putChar '\n'
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 5. Definir la función
@@ -101,9 +130,16 @@ nuevaLinea = undefined
 --    "* * * "
 -- ---------------------------------------------------------------------
 
+
 estrellas :: Int -> String
-estrellas n = undefined
-                              
+
+estrellas 0 = ""
+
+estrellas 1 = "*"
+
+estrellas n = "* " ++ (estrellas (n-1))
+
+
 -- ---------------------------------------------------------------------
 -- Ejercicio 6. Definir la acción
 --    escribeFila :: Int -> Int -> IO ()
@@ -113,8 +149,11 @@ estrellas n = undefined
 --    2: * * *
 -- ---------------------------------------------------------------------
  
+
 escribeFila :: Int -> Int -> IO ()
-escribeFila f n =  undefined
+
+escribeFila f n = putStrLn ((show f) ++ ": " ++ (estrellas n))
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 7. Definir la acción
@@ -129,8 +168,11 @@ escribeFila f n =  undefined
 --    5: * 
 -- ---------------------------------------------------------------------
 
+
 escribeTablero :: Tablero -> IO ()
-escribeTablero = undefined
+
+escribeTablero t = sequence_ [escribeFila f (t!!(f-1)) | f <- [1..length t]] 
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 8. Definir la acción
