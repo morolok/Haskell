@@ -54,7 +54,7 @@ caminosR :: (Int,Int) -> [[(Int,Int)]]
 
 caminosR (1,y) = [[(1,z) | z <- [y,y-1..1]]]
 
-caminosR (x,1) = [[(1,z) | z <- [x,x-1..1]]]
+caminosR (x,1) = [[(z,1) | z <- [x,x-1..1]]]
 
 caminosR (x,y) = [(x,y):cs | cs <- (caminosR (x-1,y) ++ caminosR (x,y-1))]
 
@@ -97,8 +97,11 @@ caminosPD (m,n) = q!(m,n)
 --      nCaminosR (3,4)                        ==  10
 -- ---------------------------------------------------------------------
 
+
 nCaminosCR :: (Int,Int) -> Integer
-nCaminosCR = undefined
+
+nCaminosCR (m,n) = genericLength (caminosR (m,n))
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.2. Definir, usando caminosPD, la función
@@ -107,8 +110,11 @@ nCaminosCR = undefined
 -- dimensión mxn desde (1,1) hasta (m,n). Por ejemplo,
 -- ---------------------------------------------------------------------
 
+
 nCaminosCPD :: (Int,Int) -> Integer
-nCaminosCPD = undefined
+
+nCaminosCPD (m,n) = genericLength (caminosPD (m,n))
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.3. Definir, por recursión, la función
@@ -117,8 +123,15 @@ nCaminosCPD = undefined
 -- dimensión mxn desde (1,1) hasta (m,n). Por ejemplo,
 -- ---------------------------------------------------------------------
 
+
 nCaminosR :: (Int,Int) -> Integer
-nCaminosR = undefined
+
+nCaminosR (1, _) = 1
+
+nCaminosR (_, 1) = 1
+
+nCaminosR (x, y) = nCaminosR (x-1, y) + nCaminosR (x, y-1)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.4. Definir, por programación dinámica, la función
@@ -127,8 +140,18 @@ nCaminosR = undefined
 -- dimensión mxn desde (1,1) hasta (m,n). Por ejemplo,
 -- ---------------------------------------------------------------------
 
+
 nCaminosPD :: (Int,Int) -> Integer
-nCaminosPD p = undefined
+
+nCaminosPD p = q!p
+    where q = nCaminosPD2 p
+
+nCaminosPD2 (m,n) = q
+    where q = matrix m n f
+          f (1, _) = 1
+          f (_, 1) = 1
+          f (x, y) = q!(x-1, y) + q!(x, y-1)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.5. Los caminos desde (1,1) a (m,n) son las permutaciones
@@ -142,8 +165,16 @@ nCaminosPD p = undefined
 -- dimensión mxn desde (1,1) hasta (m,n). Por ejemplo,
 -- ---------------------------------------------------------------------
 
+
+fact :: Int -> Integer
+
+fact n = product [1.. fromIntegral n]
+
+
 nCaminosF :: (Int,Int) -> Integer
-nCaminosF = undefined
+
+nCaminosF (m, n) = (fact ((m-1)+(n-1))) `div` (fact ((m-1)*(n-1)))
+
  
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.6. La fórmula anterior para el cálculo del número de
@@ -160,7 +191,8 @@ nCaminosFS = undefined
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.7. Comparar la eficiencia calculando el tiempo necesario
--- para evaluar las siguientes expresiones 
+-- para evaluar las siguientes expresiones
+-- :set +s
 --    nCaminosCR  (8,8)
 --    nCaminosCPD (8,8)
 --    nCaminosCR  (12,12)
