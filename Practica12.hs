@@ -192,8 +192,18 @@ escribeTablero t = sequence_ [escribeFila f (t!!(f-1)) | f <- [1..length t]]
 --    3
 -- ---------------------------------------------------------------------
 
+
 leeDigito :: String -> IO Int
-leeDigito c = undefined
+
+leeDigito c = do
+    putStr c
+    xs <- getLine
+    if (length xs == 1) && (isDigit (head xs))
+        then return (read xs)
+    else do
+        putStrLn "ERROR: Entrada incorrecta"
+        leeDigito c
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 9. Los jugadores se representan por los números 1 y 2.
@@ -202,8 +212,11 @@ leeDigito c = undefined
 -- tal que (siguiente j) es el jugador siguiente de j. 
 -- ---------------------------------------------------------------------
 
+
 siguiente :: Int -> Int
-siguiente = undefined
+
+siguiente j = if (j == 1) then 2 else 1
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 10. Definir la acción
@@ -241,8 +254,28 @@ siguiente = undefined
 --    J 1 He ganado
 -- ---------------------------------------------------------------------
 
+
 juego :: Tablero -> Int -> IO ()
-juego t j = undefined
+
+juego t j = do
+    nuevaLinea
+    escribeTablero t
+    nuevaLinea
+    putStrLn ("J " ++ (show j))
+    fila <- leeDigito "Elige una fila: "
+    estrellasRetiradas <- leeDigito "Elige cuantas estrellas retiras: "
+    nuevaLinea
+    if (valida t fila estrellasRetiradas) then do
+        let nuevoT = jugada t fila estrellasRetiradas
+        if (finalizado nuevoT) then
+            putStrLn ("J " ++ (show j) ++ " Ha ganado")
+        else do
+            let siguienteJ = siguiente j
+            juego nuevoT siguienteJ
+    else do
+        putStrLn "Jugada no valida, elija otra"
+        juego t j
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 11. Definir la acción
@@ -331,10 +364,16 @@ juego t j = undefined
 -- ---------------------------------------------------------------------
 
 nim :: IO ()
-nim = undefined
+nim = juego inicial 1
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 12. Definir la función principal para poder compilar el
 -- el fichero. Compila el fichero y genera un ejecutable.
 -- ---------------------------------------------------------------------
 
+
+-- Comando para generar el ejecutable del main: ghc Practica12.hs -o nim
+
+main :: IO()
+
+main = nim
