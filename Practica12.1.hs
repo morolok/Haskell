@@ -372,7 +372,7 @@ nim = juego inicial 1
 -- ---------------------------------------------------------------------
 
 
--- Comando para generar el ejecutable del main: ghc Practica12.hs -o nim
+-- Comando para generar el ejecutable del main para que salgan los archivos ejecutables: ghc Practica12.hs -o nim
 
 main :: IO()
 
