@@ -17,7 +17,9 @@
 -- ---------------------------------------------------------------------
 
 
-import System.Enviroment (getArgs)
+import System.Environment (getArgs)
+
+import Control.Exception (catch, SomeException)
 
 
 main0 :: IO ()
@@ -46,6 +48,8 @@ main0 = do
 -- ---------------------------------------------------------------------
 
 
+-- Metodo para contar los parrafos de un text
+
 contarParrafos :: [String] -> Int
 
 contarParrafos [] = 0
@@ -55,6 +59,7 @@ contarParrafos (l:lineas)
     | otherwise = 1 + (contarParrafos lineas)
 
 
+-- Metodo para contar las palabras de cada parrafo de un texto
 
 contarPalabrasxParrafo :: [String] -> [Int]
 
@@ -65,6 +70,8 @@ contarPalabrasxParrafo (l:lineas)
     | otherwise = (palabras):(contarPalabrasxParrafo lineas)
     where palabras = length (words l)
 
+
+-- Metodo para contar cada letra e de un parrafo de un texto
 
 contarExParrafo :: [String] -> [Int]
 
@@ -79,19 +86,9 @@ contarEs (p:palabras) res = contarEs palabras (res + numEs)
     where numEs = length (filter (=='e') p)
 
 
-main1 :: IO ()
+-- Metodo para procesar un fichero con los metodos anteriores
 
-main1 = do
-    f <- readFile "lorem_ipsum.txt"
-    let lineas = lines f
-    let parrafos = contarParrafos lineas
-    let palabrasxParrafo = contarPalabrasxParrafo lineas
-    let exParrafo = contarExParrafo lineas
-    putStrLn ("(" ++ (show parrafos) ++ ", " ++ (show palabrasxParrafo) ++ ", " ++ (show exParrafo) ++ ")")
-
-
---main = main1
-
+procesaFichero :: FilePath -> IO()
 
 procesaFichero nf = do
     f <- readFile nf
@@ -100,6 +97,15 @@ procesaFichero nf = do
     let palabrasxParrafo = contarPalabrasxParrafo lineas
     let exParrafo = contarExParrafo lineas
     putStrLn ("(" ++ (show parrafos) ++ ", " ++ (show palabrasxParrafo) ++ ", " ++ (show exParrafo) ++ ")")
+
+
+
+main1 :: IO ()
+
+main1 = procesaFichero "lorem_ipsum.txt"
+
+
+--main = main1
 
 
 -- ---------------------------------------------------------------------
@@ -121,7 +127,8 @@ procesaFichero nf = do
 
 main2 :: IO ()
 
-main2 = do args <- getArgs
+main2 = do
+    args <- getArgs
     let ns = nombreFichero args
     procesaFichero ns
 
@@ -133,7 +140,8 @@ nombreFichero [] = "default.txt"
 
 nombreFichero (xs:xss) = xs
   
-main = main2
+--main = main2
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 3. Adaptar el ejercicio anterior para que trate el posible
@@ -150,8 +158,28 @@ main = main2
 --    "El fichero no existe"
 -- ---------------------------------------------------------------------
 
-main3 :: IO ()
-main3 = undefined
 
--- main = main3
+procesaFicheroExcp :: FilePath -> IO()
+
+procesaFicheroExcp nf = do
+    f <- catch (readFile nf)
+        (\err -> do print(err::SomeException)
+                    putStrLn ("El fichero no existe")
+                    return "")
+    let lineas = lines f
+    let parrafos = contarParrafos lineas
+    let palabrasxParrafo = contarPalabrasxParrafo lineas
+    let exParrafo = contarExParrafo lineas
+    putStrLn ("(" ++ (show parrafos) ++ ", " ++ (show palabrasxParrafo) ++ ", " ++ (show exParrafo) ++ ")")
+
+
+main3 :: IO ()
+
+main3 = do
+    args <- getArgs
+    let ns = nombreFichero args
+    procesaFicheroExcp ns
+
+
+main = main3
 
