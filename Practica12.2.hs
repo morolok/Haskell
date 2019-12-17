@@ -17,6 +17,9 @@
 -- ---------------------------------------------------------------------
 
 
+import System.Enviroment (getArgs)
+
+
 main0 :: IO ()
 
 main0 = do
@@ -43,12 +46,61 @@ main0 = do
 -- ---------------------------------------------------------------------
 
 
+contarParrafos :: [String] -> Int
+
+contarParrafos [] = 0
+
+contarParrafos (l:lineas)
+    | l == "\r" = 0 + (contarParrafos lineas)
+    | otherwise = 1 + (contarParrafos lineas)
+
+
+
+contarPalabrasxParrafo :: [String] -> [Int]
+
+contarPalabrasxParrafo [] = []
+
+contarPalabrasxParrafo (l:lineas)
+    | l == "\r" = contarPalabrasxParrafo lineas
+    | otherwise = (palabras):(contarPalabrasxParrafo lineas)
+    where palabras = length (words l)
+
+
+contarExParrafo :: [String] -> [Int]
+
+contarExParrafo [] = []
+
+contarExParrafo (l:lineas) = if (l /= "\r") then (contarEs palabras 0):(contarExParrafo lineas) else contarExParrafo lineas
+    where palabras = words l
+
+contarEs [] res = res
+
+contarEs (p:palabras) res = contarEs palabras (res + numEs)
+    where numEs = length (filter (=='e') p)
+
+
 main1 :: IO ()
 
-main1 = undefined
+main1 = do
+    f <- readFile "lorem_ipsum.txt"
+    let lineas = lines f
+    let parrafos = contarParrafos lineas
+    let palabrasxParrafo = contarPalabrasxParrafo lineas
+    let exParrafo = contarExParrafo lineas
+    putStrLn ("(" ++ (show parrafos) ++ ", " ++ (show palabrasxParrafo) ++ ", " ++ (show exParrafo) ++ ")")
 
 
 --main = main1
+
+
+procesaFichero nf = do
+    f <- readFile nf
+    let lineas = lines f
+    let parrafos = contarParrafos lineas
+    let palabrasxParrafo = contarPalabrasxParrafo lineas
+    let exParrafo = contarExParrafo lineas
+    putStrLn ("(" ++ (show parrafos) ++ ", " ++ (show palabrasxParrafo) ++ ", " ++ (show exParrafo) ++ ")")
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2. Adaptar el ejercicio anterior para que podamos
@@ -66,10 +118,22 @@ main1 = undefined
 --    (8,[86,89,65,103,97,100,95,112],[62,57,50,69,63,60,69,65])
 -- ---------------------------------------------------------------------
 
+
 main2 :: IO ()
-main2 = undefined
+
+main2 = do args <- getArgs
+    let ns = nombreFichero args
+    procesaFichero ns
+
+
+
+nombreFichero :: [String] -> String
+
+nombreFichero [] = "default.txt"
+
+nombreFichero (xs:xss) = xs
   
---main = main2
+main = main2
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 3. Adaptar el ejercicio anterior para que trate el posible
