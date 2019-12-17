@@ -16,7 +16,9 @@
 -- Importación de librerías                                           --
 -- ---------------------------------------------------------------------
 
+
 main0 :: IO ()
+
 main0 = do
   putStrLn "Vamos con los ejercicios propuestos..."
   putStrLn "--------------------------------------"
@@ -24,7 +26,9 @@ main0 = do
   putStrLn "posteriores para que su main vaya llamando a cada mainN"
   putStrLn "conforme vaya avanzando."
 
-main = main0
+
+--main = main0
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1. Crear un programa que lea el fichero "lorem_ipsum.txt"
@@ -38,8 +42,11 @@ main = main0
 --    (5,[105,158,46,64,52],[41,60,16,24,28])
 -- ---------------------------------------------------------------------
 
+
 main1 :: IO ()
+
 main1 = undefined
+
 
 --main = main1
 
