@@ -7,8 +7,11 @@
 -- Importación de librerías                                           --
 -- ---------------------------------------------------------------------
 
+
 {-# LANGUAGE OverloadedStrings #-}
+
 import CodeWorld
+
 
 -- ---------------------------------------------------------------------
 -- Introducción                                                       --
@@ -48,7 +51,9 @@ situación intermedia que pueda darse a lo largo del proceso.
 Utilizaremos una tupla con cinco elementos:
 --}
 
+
 type Estado = (Int, Int, Robot, [Rojo], [Opcion])
+
 
 {--
 * Número de filas del tablero
@@ -58,7 +63,9 @@ type Estado = (Int, Int, Robot, [Rojo], [Opcion])
   correspondiente. Llamamos Robot al tipo de tuplas descrito.
 --}
 
+
 type Robot = (Int, Int)
+
 
 {--
 * Cuadrados del tablero que ya se han pintado de rojo (excluyendo la
@@ -67,7 +74,9 @@ type Robot = (Int, Int)
   Llamamos Rojo al tipo de tuplas descrito.
 --}
 
+
 type Rojo = (Int, Int)
+
 
 {--
 * Opciones de movimiento que el robot puede hacer desde su
@@ -77,7 +86,9 @@ type Rojo = (Int, Int)
   al tipo de tupla descrito.
 --}
 
+
 type Opcion = (Event, Int, Int)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicios                                                         --
@@ -92,12 +103,17 @@ una imagen de cualquier estado.
   m, dibujen un tablero negro de tamaño nxm.
 --}
 
-pintaNegro :: Int -> Int -> Picture
-pintaNegro = undefined
 
--- main :: IO()
--- main = drawingOf ((pintaNegro 3 4) & coordinatePlane) -- (1)
--- main = drawingOf ((pintaNegro 8 8) & coordinatePlane) -- (2)
+pintaNegro :: Int -> Int -> Picture
+
+pintaNegro n m = translated ((x+1)/2) ((y+1)/2) (solidRectangle x y)
+    where x = fromIntegral n
+          y = fromIntegral m
+
+
+--main :: IO()
+--main = drawingOf ((pintaNegro 3 4) & coordinatePlane) -- (1)
+--main = drawingOf ((pintaNegro 8 8) & coordinatePlane) -- (2)
               
 {--
 * Definir una función pintaRobot que dado un robot dibuje un circulo
@@ -105,26 +121,36 @@ pintaNegro = undefined
   deberá estar pintado de rojo.
 --}
 
-pintaRobot :: Robot -> Picture
-pintaRobot = undefined
 
--- main :: IO()
--- main = drawingOf ((pintaRobot (1, 3)) & (pintaNegro 3 4) & coordinatePlane) -- (3)
--- main = drawingOf ((pintaRobot (1, 8)) & (pintaNegro 8 8) & coordinatePlane) -- (4)
+pintaRobot :: Robot -> Picture
+
+pintaRobot (r1, r2) = (translated x y (colored yellow (solidCircle 0.4))) & (translated x y (colored red (solidRectangle 1 1)))
+  where x = fromIntegral r1
+        y = fromIntegral r2
+
+
+--main :: IO()
+--main = drawingOf ((pintaRobot (1, 3)) & (pintaNegro 3 4) & coordinatePlane) -- (3)
+--main = drawingOf ((pintaRobot (1, 8)) & (pintaNegro 8 8) & coordinatePlane) -- (4)
 
 {--
 * Definir una función pintaRojo que dada una lista de rojos dibuje
   de rojo cada uno de los cuadrados indicados.
 --}
 
-pintaRojo :: [Rojo] -> Picture
-pintaRojo = undefined
 
--- main :: IO()
--- main = drawingOf ((pintaRojo [(2, 1), (1, 3)]) & (pintaRobot (3, 3)) &
---                   (pintaNegro 3 4) & coordinatePlane) -- (5)
--- main = drawingOf ((pintaRojo [(2, 6), (1, 8)]) & (pintaRobot (4, 5)) &
---                   (pintaNegro 8 8) & coordinatePlane) -- (6)
+pintaRojo :: [Rojo] -> Picture
+
+pintaRojo [] = blank
+
+pintaRojo ((i, j):lr) = (translated x y (colored red (solidRectangle 1 1))) & (pintaRojo lr)
+  where x = fromIntegral i
+        y = fromIntegral j
+
+
+--main :: IO()
+--main = drawingOf ((pintaRojo [(2, 1), (1, 3)]) & (pintaRobot (3, 3)) & (pintaNegro 3 4) & coordinatePlane) -- (5)
+--main = drawingOf ((pintaRojo [(2, 6), (1, 8)]) & (pintaRobot (4, 5)) & (pintaNegro 8 8) & coordinatePlane) -- (6)
 
 {--
 * Definir una función pintaOpcion que dada una lista de opciones
@@ -132,35 +158,36 @@ pintaRojo = undefined
   las teclas que hay que pulsar para mover el robot.
 --}
 
-pintaOpcion :: [Opcion] -> Picture
-pintaOpcion = undefined
 
--- main :: IO()
--- main = drawingOf ((pintaOpcion [(KeyPress "1",2,1), (KeyPress "2",3,2)]) &
---                   (pintaRojo []) & (pintaRobot (1, 3)) &
---                   (pintaNegro 3 4) & coordinatePlane) -- (7)
--- main = drawingOf ((pintaOpcion [(KeyPress "1",1,4), (KeyPress "2",3,4),
---                                 (KeyPress "3",4,5), (KeyPress "4",4,7),
---                                 (KeyPress "5",3,8)]) &
---                   (pintaRojo [(1, 8)]) & (pintaRobot (2, 6)) &
---                   (pintaNegro 8 8) & coordinatePlane) -- (8)
+pintaOpcion :: [Opcion] -> Picture
+
+pintaOpcion [] = blank
+
+pintaOpcion ((KeyPress t, f, c):os) = translated x y (colored green (scaled 0.5 0.5 (lettering t))) & pintaOpcion os
+  where x = fromIntegral f
+        y = fromIntegral c
+
+
+--main :: IO()
+--main = drawingOf ((pintaOpcion [(KeyPress "1",2,1), (KeyPress "2",3,2)]) & (pintaRojo []) & (pintaRobot (1, 3)) & (pintaNegro 3 4) & coordinatePlane) -- (7)
+--main = drawingOf ((pintaOpcion [(KeyPress "1",1,4), (KeyPress "2",3,4), (KeyPress "3",4,5), (KeyPress "4",4,7), (KeyPress "5",3,8)]) & (pintaRojo [(1, 8)]) & (pintaRobot (2, 6)) & (pintaNegro 8 8) & coordinatePlane) -- (8)
 
 {--
 * Por último, definir una función pintaEstado que dado un estado
   dibuje la situación descrita.
 --}
 
-pintaEstado :: Estado -> Picture
-pintaEstado = undefined
 
--- main :: IO()
--- main = drawingOf ((pintaEstado (3, 4, (1, 3), [], [(KeyPress "1",2,1), (KeyPress "2",3,2)])) & 
---                   coordinatePlane) -- (7)       
--- main = drawingOf ((pintaEstado (8, 8, (2, 6), [(1, 8)],
---                                 [(KeyPress "1",1,4), (KeyPress "2",3,4),
---                                  (KeyPress "3",4,5), (KeyPress "4",4,7),
---                                  (KeyPress "5",3,8)])) &
---                   coordinatePlane) -- (8)
+pintaEstado :: Estado -> Picture
+
+pintaEstado (n, m, r, rs, os) = translated (-x/2) (-y/2) (pintaRobot r & pintaOpcion os & pintaRojo rs & pintaNegro n m)
+  where x = fromIntegral n
+        y = fromIntegral m
+
+
+--main :: IO()
+--main = drawingOf ((pintaEstado (3, 4, (1, 3), [], [(KeyPress "1",2,1), (KeyPress "2",3,2)])) & coordinatePlane) -- (7)       
+--main = drawingOf ((pintaEstado (8, 8, (2, 6), [(1, 8)], [(KeyPress "1",1,4), (KeyPress "2",3,4), KeyPress "3",4,5), (KeyPress "4",4,7), (KeyPress "5",3,8)])) & coordinatePlane) -- (8)
   
 {--
 Ejercicio 2:
