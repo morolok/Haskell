@@ -48,7 +48,7 @@ main0 = do
 -- ---------------------------------------------------------------------
 
 
--- Metodo para contar los parrafos de un text
+-- Metodo para contar los parrafos de un texto
 
 contarParrafos :: [String] -> Int
 
