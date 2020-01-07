@@ -185,10 +185,11 @@ pintaEstado (n, m, r, rs, os) = translated (-x/2) (-y/2) (pintaRobot r & pintaOp
         y = fromIntegral m
 
 
---main :: IO()
+main :: IO()
 --main = drawingOf ((pintaEstado (3, 4, (1, 3), [], [(KeyPress "1",2,1), (KeyPress "2",3,2)])) & coordinatePlane) -- (7)       
---main = drawingOf ((pintaEstado (8, 8, (2, 6), [(1, 8)], [(KeyPress "1",1,4), (KeyPress "2",3,4), KeyPress "3",4,5), (KeyPress "4",4,7), (KeyPress "5",3,8)])) & coordinatePlane) -- (8)
-  
+main = drawingOf ((pintaEstado (8, 8, (2, 6), [(1, 8)], [(KeyPress "1",1,4), (KeyPress "2",3,4), (KeyPress "3",4,5), (KeyPress "4",4,7), (KeyPress "5",3,8)])) & coordinatePlane) -- (8)
+
+
 {--
 Ejercicio 2:
 En los ejemplos anteriores se ha proporcionado la lista de opciones
@@ -204,8 +205,29 @@ tablero, el número de columnas, la posición del robot y los cuadrados
 ya pintados de rojo devuelva la lista de opciones correspondiente.
 --}
 
+type Movimiento = (Event, Int, Int)
+
+movimientos :: [Movimiento]
+
+movimientos = [(KeyPress "1", 1, -2), (KeyPress "2", 2, -1), (KeyPress "3", 2, 1), (KeyPress "4", 1, 2), (KeyPress "5", -1, 2), (KeyPress "6", -2, 1),
+               (KeyPress "7", -2, -1), (KeyPress "8", -1, -2)]
+
+
+mov2op :: Movimiento -> Robot -> Opcion
+
+mov2op (e, x, y) (i, j) = (e, i+x, y+j)
+
+
+aplicaMovimientos :: Robot -> [Movimiento] -> [Opcion]
+
+aplicaMovimientos r ms = map (\m -> mov2op m r) ms
+
+
 calculaOpciones :: Int -> Int -> [Rojo] -> Robot -> [Opcion]
-calculaOpciones = undefined
+
+calculaOpciones n m rs r = [(e, x, y) | (e, x, y) <- os, (x >= 1) && (x <= n) && (y >= 1) && (y <= m) && (notElem (x, y) rs)]
+    where os = aplicaMovimientos r movimientos
+
 
 -- *Main> calculaOpciones 3 4 [] (1, 3)
 -- [(KeyPress "5",2,1),(KeyPress "7",3,2)]
@@ -222,8 +244,11 @@ usuario elegida a la situación descrita en la imagen.
   determine el estado resultante.
 --}
 
+
 manejaEvento :: Event -> Estado -> Estado
-manejaEvento = undefined
+
+manejaEvento e es = undefined
+
 -- manejaEvento _ estado = estado
 
 -- main :: IO()
