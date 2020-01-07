@@ -180,14 +180,14 @@ pintaOpcion ((KeyPress t, f, c):os) = translated x y (colored green (scaled 0.5 
 
 pintaEstado :: Estado -> Picture
 
-pintaEstado (n, m, r, rs, os) = translated (-x/2) (-y/2) (pintaRobot r & pintaOpcion os & pintaRojo rs & pintaNegro n m)
+pintaEstado (n, m, r, rs, os) = translated (-(x+1)/2) (-(y+1)/2) (pintaRobot r & pintaOpcion os & pintaRojo rs & pintaNegro n m)
   where x = fromIntegral n
         y = fromIntegral m
 
 
-main :: IO()
---main = drawingOf ((pintaEstado (3, 4, (1, 3), [], [(KeyPress "1",2,1), (KeyPress "2",3,2)])) & coordinatePlane) -- (7)       
-main = drawingOf ((pintaEstado (8, 8, (2, 6), [(1, 8)], [(KeyPress "1",1,4), (KeyPress "2",3,4), (KeyPress "3",4,5), (KeyPress "4",4,7), (KeyPress "5",3,8)])) & coordinatePlane) -- (8)
+--main :: IO()
+--main = drawingOf ((pintaEstado (3, 4, (1, 3), [], [(KeyPress "1",2,1), (KeyPress "2",3,2)])) & coordinatePlane) -- (7)
+--main = drawingOf ((pintaEstado (8, 8, (2, 6), [(1, 8)], [(KeyPress "1",1,4), (KeyPress "2",3,4), (KeyPress "3",4,5), (KeyPress "4",4,7), (KeyPress "5",3,8)])) & coordinatePlane) -- (8)
 
 
 {--
@@ -204,6 +204,7 @@ Definir una función calculaOpciones que, dados el número de filas del
 tablero, el número de columnas, la posición del robot y los cuadrados
 ya pintados de rojo devuelva la lista de opciones correspondiente.
 --}
+
 
 type Movimiento = (Event, Int, Int)
 
@@ -247,15 +248,23 @@ usuario elegida a la situación descrita en la imagen.
 
 manejaEvento :: Event -> Estado -> Estado
 
-manejaEvento e es = undefined
+--manejaEvento _ estado = estado
 
--- manejaEvento _ estado = estado
+manejaEvento evento estado@(n, m, r, rs, os)
+    | eventoEnOpciones = nuevoEstado 
+    | otherwise = estado
+    where eventoEnOpciones = length [e | (e, _, _) <- os, e == evento] == 1
+          nuevoEstado = (n, m, nuevoRobot, nuevasRojas, nuevasOpciones)
+          nuevoRobot = head [((fst r) + x, (snd r) + y) | (e, x, y) <- os, e == evento]
+          nuevasRojas = r:rs
+          nuevasOpciones = calculaOpciones n m nuevasRojas nuevoRobot
 
--- main :: IO()
--- main = interactionOf (3, 4, (1, 3), [], (calculaOpciones 3 4 [] (1, 3)))
---        (\_ estado -> estado) manejaEvento pintaEstado
--- main = interactionOf (8, 8, (1, 8), [], (calculaOpciones 8 8 [] (1, 8)))
---        (\_ estado -> estado) manejaEvento pintaEstado
+
+
+main :: IO()
+main = interactionOf (3, 4, (1, 3), [], (calculaOpciones 3 4 [] (1, 3))) (\_ estado -> estado) manejaEvento pintaEstado
+-- main = interactionOf (8, 8, (1, 8), [], (calculaOpciones 8 8 [] (1, 8))) (\_ estado -> estado) manejaEvento pintaEstado
+
 
 {--
 * Definir una función juego que dados el número de filas y de
@@ -263,8 +272,13 @@ manejaEvento e es = undefined
   debe situarse, inicialmente, en la casilla superior izquierda del tablero.
 --}
 
+
+estadoInicial n m = (n, m, (1,n), [], (calculaOpciones n m [] (1,n)))
+
 juego :: Int -> Int -> IO()
-juego = undefined
+
+juego n m = activityOf estadoInicial
+
 
 -- main :: IO()
 -- main = juego 3 4
