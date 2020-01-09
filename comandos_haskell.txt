@@ -1,0 +1,10 @@
+
+Paralelismo:
+
+ghc -O2 Practica14.hs -rtsopts -threaded
+
+./Practica14 +RTS -NX -s -> ./Practica14 +RTS -N2 -s
+	-N1 porque usamos el método secuencial. Un procesador.
+	-N2 porque usamos el método paralelo. 2 procesadores.
+
+Aceleración = Tiempo Lento / Tiempo rápido
