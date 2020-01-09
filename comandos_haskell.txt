@@ -1,3 +1,9 @@
+Main:
+
+ghc Practica12.1.hs -o nim
+	Comando para crear ejecutables del main
+
+
 
 Paralelismo:
 
