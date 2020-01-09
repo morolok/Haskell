@@ -96,7 +96,7 @@ fibPar2 n = runEval $ do
 -- ---------------------------------------------------------------------
 
 
-cutoff = 10
+cutoff = 23
 
 fibPar3 0 = 1
 
@@ -113,12 +113,13 @@ fibPar3 n
 
 -- Descomentar el siguiente main para probar las funciones de fib
 
+{-
 main :: IO (Int)
 main = do
     let fib = fibPar1 40
     print fib
     return fib
-
+-}
   
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.1. Definir mergesort, que reciba una lista de
@@ -127,7 +128,21 @@ main = do
 -- y mezclarlas de forma ordenada.
 -- ---------------------------------------------------------------------
  
-seqMergeSort = undefined
+seqMergeSort [] = []
+
+seqMergeSort [x] = [x]
+
+seqMergeSort xs = mezclaOrdenada (seqMergeSort as) (seqMergeSort bs)
+    where (as,bs) = splitAt (length xs `div` 2) xs
+
+
+mezclaOrdenada [] ys = ys
+
+mezclaOrdenada xs [] = xs
+
+mezclaOrdenada (x:xs) (y:ys)
+    | x <= y = x:(mezclaOrdenada xs (y:ys))
+    | otherwise = y:(mezclaOrdenada (x:xs) ys)
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.2. Definir mergesort, que reciba una lista de
@@ -137,17 +152,24 @@ seqMergeSort = undefined
 -- paralelismo.
 -- ---------------------------------------------------------------------
 
-parMergeSort xs = undefined
+parMergeSort xs = runEval $ do
+    let (as,bs) = splitAt (length xs `div` 2) xs
+    p1 <- rpar (force (seqMergeSort as))
+    p2 <- rpar (force (seqMergeSort bs))
+    rseq p1
+    rseq p2
+    return (mezclaOrdenada p1 p2)
 
 -- Descomentar el siguiente main para probar las funciones de 
 -- mergesort
-{-main :: IO ([Int])
+
+main :: IO ([Int])
 main = do
     let xs = [1000000,999999..1]
     let oxs = parMergeSort xs 
     print (length oxs)
     return (oxs)
--}
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 3.1. Redefinir la función parMap', tal que reciba
@@ -155,8 +177,16 @@ main = do
 -- de f sobre los elementos de la lista (ver tema de teoría).
 -- ---------------------------------------------------------------------
 
+
 parMap' :: (a -> b) -> [a] -> Eval [b]
-parMap' = undefined
+
+parMap' f [] = return []
+
+parMap' f (a:as) = do
+    b <- rpar (f a)
+    bs <- parMap' f as
+    rseq (b:bs)
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 3.2. Definir la función parallelMap, tal que reciba
@@ -164,8 +194,10 @@ parMap' = undefined
 -- de f sobre los elementos de la lista, empleando parMap'.
 -- ---------------------------------------------------------------------
 
+
 parallelMap :: (a -> b) -> [a] -> [b]
-parallelMap = undefined
+
+parallelMap f xs = runEval $ parMap' f xs
 
 
 -- -------------------------------------------------------------
