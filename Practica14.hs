@@ -7,8 +7,11 @@
 -- Importación de librerías                                           --
 -- ---------------------------------------------------------------------
 
+
 import Control.Parallel.Strategies
+
 import Control.DeepSeq
+
 
 -- ---------------------------------------------------------------------
 -- Introducción                                                       --
@@ -33,8 +36,14 @@ import Control.DeepSeq
 -- la función de fibonacci definida por recursión. Es decir:
 --   fib(n) = fib(n-1) + fib(n-2), fib(0) = 1 y fib(1) = 1
 -- ---------------------------------------------------------------------
-  
-fibSer = undefined
+
+
+fibSer 0 = 1
+
+fibSer 1 = 1
+
+fibSer n = (fibSer (n-1)) + (fibSer (n-2))
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1.2. Definir la función fibPar1, tal que sea la
@@ -44,7 +53,17 @@ fibSer = undefined
 -- y analizar el resultado.
 -- ---------------------------------------------------------------------
 
-fibPar1 = undefined
+
+fibPar1 0 = 1
+
+fibPar1 1 = 1
+
+fibPar1 n = runEval $ do
+    fb1 <- rpar (fibPar1 (n-1))
+    fb2 <- rpar (fibPar1 (n-2))
+    res <- rseq (fb1+fb2)
+    return res
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1.3. Definir la función fibPar2, tal que sea la
@@ -55,7 +74,17 @@ fibPar1 = undefined
 -- y analizar el resultado.
 -- ---------------------------------------------------------------------
 
-fibPar2 = undefined
+
+fibPar2 0 = 1
+
+fibPar2 1 = 1
+
+fibPar2 n = runEval $ do
+    fb1 <- rpar (fibSer (n-1))
+    fb2 <- rpar (fibSer (n-2))
+    res <- rseq (fb1+fb2)
+    return res
+
         
 -- ---------------------------------------------------------------------
 -- Ejercicio 1.4. Definir la función fibPar3 tal que sea la
@@ -66,17 +95,30 @@ fibPar2 = undefined
 -- de paralelismo y analizar el resultado.
 -- ---------------------------------------------------------------------
 
-cutoff = undefined
 
-fibPar3 = undefined
+cutoff = 10
+
+fibPar3 0 = 1
+
+fibPar3 1 = 1
+
+fibPar3 n
+    | n < cutoff = fibSer n
+    | otherwise = runEval $ do
+        fb1 <- rpar (fibPar3 (n-1))
+        fb2 <- rpar (fibPar3 (n-2))
+        res <- rseq (fb1+fb2)
+        return res
+
 
 -- Descomentar el siguiente main para probar las funciones de fib
-{-main :: IO (Int)
+
+main :: IO (Int)
 main = do
-	let fib = fibPar3 40 
-	print fib
-	return fib
--}
+    let fib = fibPar1 40
+    print fib
+    return fib
+
   
 -- ---------------------------------------------------------------------
 -- Ejercicio 2.1. Definir mergesort, que reciba una lista de
