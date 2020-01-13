@@ -14,3 +14,5 @@ ghc -O2 Practica14.hs -rtsopts -threaded
 	-N2 porque usamos el método paralelo. 2 procesadores.
 
 Aceleración = Tiempo Lento / Tiempo rápido
+Aceleración = Tiempor del primero que hemos ejecutado / Tiempo del segundo que hemos ejecutado
+	Para ver como de rápido o lento es uno respecto de otro
