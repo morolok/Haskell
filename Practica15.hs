@@ -139,7 +139,7 @@ bitplanes m = [matrix nr nc (f b) | b <- [n,n-1..1]]
 -- ---------------------------------------------------------------------
 
 
---obtenDigitos :: Int -> [Int]
+obtenDigitos :: Int -> [Int]
 
 obtenDigitos n = [digitToInt c | c <- show n]
 
@@ -148,22 +148,24 @@ sucBelga k n = map fst (iterate f (k,digitos n))
     where f (x,ds) = (x+head ds,(tail ds)++[head ds])
 
 
-{-obtenSucesion n dig cont res
-    | cont == (length dig) = obtenSucesion n dig 0 res
-    | cont == 0 && length res == 1 = res++[num]++(obtenSucesion n dig (cont+1) (res++[num]))
-    | otherwise = [num]++(obtenSucesion n dig (cont+1) (res++[num]))
-    where num = (last res)+(dig!!cont)-}
+obtenSucesion dig cont res
+    | cont == (length dig) = obtenSucesion dig 0 res
+    | cont == 0 && length res == 1 = res++[num]++(obtenSucesion dig (cont+1) (res++[num]))
+    | otherwise = [num]++(obtenSucesion dig (cont+1) (res++[num]))
+    where num = (last res)+(dig!!cont)
 
 
 
 esBelga k n
-    | (elem k ls) || (elem n ls) = True
+    | elem n ls = True
     | otherwise = False
-    where ls = takeWhile (<=n) (sucBelga k n)
+    where dig = obtenDigitos n
+          ls = takeWhile (<=n) (obtenSucesion dig 0 [k])
+          -- ls = takeWhile (<=n) (sucBelga k n)
 
-esBelga k n = elem n $ takeWhile (<=n) $ map (fst) $ iterate (\(ac,n) -> (ac + read [(n!!0)], shiftL n)) (k, show n)
+--esBelga k n = elem n $ takeWhile (<=n) $ map (fst) $ iterate (\(ac,n) -> (ac + read [(n!!0)], shiftL n)) (k, show n)
 
-shiftL xs = (drop 1 xs)++(take 1 xs)
+--shiftL xs = (drop 1 xs)++(take 1 xs)
 
 
 
