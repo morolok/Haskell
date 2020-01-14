@@ -12,6 +12,7 @@
 
 
 import Data.Matrix
+import Data.Char
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 1. (Septiembre 2019, PD). Matrices
@@ -42,8 +43,37 @@ import Data.Matrix
 -- desde el más significativo (el '1' más significativo de todos los
 -- elementos de la matriz) hasta el menos significativo. La siguiente
 -- matriz de ejemplo corresponde al anterior.
+
+
 matrizEj :: Matrix Int
+
 matrizEj = fromLists [[101, 1, 10], [0, 11, 100], [10, 110, 1]]
+
+
+numBitPlanes :: Matrix Int -> Int
+
+numBitPlanes m = maximum [(length.show) (m!(i,j)) | i <- [1..nrows m], j <- [1..ncols m]]
+
+
+bitI :: Int -> Int -> Int
+
+bitI i n
+    | i > length ds || i <= 0 = 0
+    | otherwise = ds!!(length ds - i)
+    where ds = digitos n
+
+
+digitos :: Int -> [Int]
+
+digitos n = [digitToInt c | c <- show n]
+
+
+bitplanes m = [matrix nr nc (f b) | b <- [n,n-1..1]]
+    where n = numBitPlanes m
+          nc = ncols m
+          nr = nrows m
+          f b (i,j) = bitI b (m!(i,j))
+
 
 -- Solución: https://www.cs.us.es/cursos/pd/examenes/Examen_20190912.zip
 -- ---------------------------------------------------------------------
@@ -107,6 +137,35 @@ matrizEj = fromLists [[101, 1, 10], [0, 11, 100], [10, 110, 1]]
 
 -- Solución: https://github.com/jaalonso/Examenes_de_PF_con_Haskell_Vol10/blob/master/Examenes/Grupo_3/examen_6_10_jun.hs
 -- ---------------------------------------------------------------------
+
+
+--obtenDigitos :: Int -> [Int]
+
+obtenDigitos n = [digitToInt c | c <- show n]
+
+
+sucBelga k n = map fst (iterate f (k,digitos n))
+    where f (x,ds) = (x+head ds,(tail ds)++[head ds])
+
+
+{-obtenSucesion n dig cont res
+    | cont == (length dig) = obtenSucesion n dig 0 res
+    | cont == 0 && length res == 1 = res++[num]++(obtenSucesion n dig (cont+1) (res++[num]))
+    | otherwise = [num]++(obtenSucesion n dig (cont+1) (res++[num]))
+    where num = (last res)+(dig!!cont)-}
+
+
+
+esBelga k n
+    | (elem k ls) || (elem n ls) = True
+    | otherwise = False
+    where ls = takeWhile (<=n) (sucBelga k n)
+
+esBelga k n = elem n $ takeWhile (<=n) $ map (fst) $ iterate (\(ac,n) -> (ac + read [(n!!0)], shiftL n)) (k, show n)
+
+shiftL xs = (drop 1 xs)++(take 1 xs)
+
+
 
 -- ---------------------------------------------------------------------
 -- Ejercicio 4. (Junio 2019, I1M). Programación Dinámica
