@@ -182,13 +182,48 @@ escribeTablerosF fs ts = writeFile fs $ unlines [fila n (t!!(n-1)) | t <- ts, n 
 -- Diferencias de este juego con el anterior:
 --   Ahora imprime el nombre de los jugadores
 --   Ahora devuelve la lista de tableros
+
 juego :: Tablero -> Int -> (String,String) -> IO [Tablero]
-juego = undefined
+juego t j jps = do nuevaLinea
+                   escribeTablero t
+                   if finalizado t 
+                     then do nuevaLinea
+                             putStr "J "
+                             putStr (jug (siguiente j))
+                             putStrLn " He ganado"
+                             return []
+                     else do nuevaLinea
+                             putStr "J "
+                             putStr (jug (siguiente j))
+                             f <- leeDigito "Elige una fila: "
+                             n <- leeDigito "Elige cuantas estrellas retiras: "
+                             if valida t f n 
+                               then do ts <- juego (jugada t f n) (siguiente j) jps
+                                       return (t:ts)                                 
+                               else do nuevaLinea
+                                       putStrLn "ERROR: jugada incorrecta"
+                                       ts <- juego t j jps
+                                       return (t:ts)
+        where jug x | x==1 = fst jps
+                    | x==2 = snd jps
+
 
 -- opciones por defecto
 defecto = [("tablero","5,4,3,2,1"),("jugador1","1"),("jugador2","2")]
 
 main :: IO ()
-main = undefined
-
-  
+main = do
+  args <- getArgs
+  let inputfile = case args of
+                    (a:_) -> a
+                    _ -> error "Faltan parámetros: nim input.txt output.txt"
+  let outputfile = case tail args of
+                     (a:_) -> a
+                     _ -> error "Faltan parámetros: nim input.txt output.txt"
+  let input = catch (procesaEntrada (leeFichero inputfile))
+                (\err -> print (err::SomeException) >> return defecto)
+  inicial <- tablero input
+  nombresJ <- jugadores input
+  ts <- juego inicial 1 nombresJ
+  catch (escribeTablerosF outputfile ts)
+               (\err -> print (err::SomeException) >> return ())
