@@ -119,7 +119,6 @@ tablero entrada = do
     let res = sacaTablero tab
     return res
 
-
 -- ---------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------
@@ -131,7 +130,13 @@ tablero entrada = do
 -- ("miguel","leugim")
 
 jugadores :: IO [(String,String)] -> IO (String,String)
-jugadores = undefined
+
+jugadores entrada = do
+    contenido <- entrada
+    let j1 = snd (contenido!!2)
+    let j2 = snd (contenido!!3)
+    let res = (j1,j2)
+    return res
   
 -- ---------------------------------------------------------------------
 
@@ -147,7 +152,10 @@ jugadores = undefined
 --   "1: * * * \n2: * * * * \n3: * \n4: \n5: * \n1: * * * * * \n2: * \n3: * * \n4: * \n5: \n"
 
 escribeTablerosF :: FilePath -> [Tablero] -> IO ()
-escribeTablerosF = undefined
+
+escribeTablerosF fs ts = writeFile fs $ unlines [fila n (t!!(n-1)) | t <- ts, n <- [1..length t]]
+  where fila f n = (show f ++ ": " ++ estrellas n ) 
+
   
 -- ---------------------------------------------------------------------
 
