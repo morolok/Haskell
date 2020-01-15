@@ -28,7 +28,7 @@ jugador2=leugim
 -- ---------------------------------------------------------------------
 
 import Data.Char
-
+import Data.List.Split
 import Control.Exception (catch, SomeException)
 import System.Environment (getArgs)
 
@@ -45,7 +45,7 @@ import System.Environment (getArgs)
 -- finalizado, valida, jugada, estrellas, siguiente, escribeTablero,
 -- nuevaLinea, leeDigito
 
--- import Nim
+import Nim
 
 -- ---------------------------------------------------------------------
 
@@ -58,7 +58,11 @@ import System.Environment (getArgs)
 -- ["tamano=6","tablero=6,5,4,3,2,1","jugador1=miguel","jugador2=leugim"]
 
 leeFichero :: String -> IO [String]
-leeFichero = undefined
+
+leeFichero fs = do
+    fichero <- readFile fs
+    let res = lines fichero
+    return res
 
 -- ---------------------------------------------------------------------
 
@@ -71,8 +75,21 @@ leeFichero = undefined
 -- [("tamano","6"),("tablero","6,5,4,3,2,1"),("jugador1","miguel"),
 --  ("jugador2","leugim")]
 
+agrupaContenido :: [String] -> [(String,String)]
+
+agrupaContenido [] = []
+
+agrupaContenido (c:cont) = cProcesado:(agrupaContenido cont)
+    where separado = splitOn "=" c
+          cProcesado = (separado!!0, separado!!1)
+
+
 procesaEntrada :: IO [String] -> IO [(String,String)]
-procesaEntrada = undefined
+
+procesaEntrada entrada = do
+    contenido <- entrada
+    let res = agrupaContenido contenido
+    return res
 
 -- ---------------------------------------------------------------------
 
@@ -84,9 +101,25 @@ procesaEntrada = undefined
 -- λ> tablero $ procesaEntrada $ leeFichero "entrada.txt"
 -- [6,5,4,3,2,1]
 
+sacaTablero :: String -> [Int]
+
+sacaTablero [] = []
+
+sacaTablero (t:tab)
+    | t == ',' = sacaTablero tab
+    | otherwise = estrellas:(sacaTablero tab)
+    where estrellas = digitToInt t
+
+
 tablero :: IO [(String,String)] -> IO [Int]
-tablero = undefined
-  
+
+tablero entrada = do
+    contenido <- entrada
+    let tab = snd (contenido!!1)
+    let res = sacaTablero tab
+    return res
+
+
 -- ---------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------
